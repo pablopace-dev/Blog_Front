@@ -28,7 +28,7 @@ app.use('/admin', require('./routers/routerAdmin'));    //Admin
 
 //404
 
-app.use(async (req, res, next) => {
+app.use(async (req, res) => {
     const user = await getUserDataCookie(req, res);
 
     res.status(404).render('404', {

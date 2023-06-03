@@ -140,7 +140,7 @@ const registerUser = async (req, res, next) => {
             await setUserCookie(req, res, user);
             await setUserToken(req, res, token);
 
-            res.redirect('/blog');
+            res.redirect('/');
 
         } else {
 
@@ -300,7 +300,7 @@ const redirectUser = async (req, res) => {
         res.redirect('/admin');
 
     else
-        res.redirect('/blog');
+        res.redirect('/');
 
 };
 

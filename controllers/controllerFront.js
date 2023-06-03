@@ -307,7 +307,7 @@ const createEntry = async (req, res) => {
         const { data } = await fetchData(url, method, req.body);
 
         if (data.ok)
-            res.redirect('/blog');
+            res.redirect('/');
 
         else {
 
