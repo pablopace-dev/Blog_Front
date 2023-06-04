@@ -56,9 +56,22 @@ const getEntries = async (req, res) => {
 
         const { url, method } = getURLs('getEntries', req);
 
-        const { data } = await fetchData(url, method);
+        const response = await fetchData(url, method);
 
-        if (data.ok) {
+        const user = await getUserDataCookie(req, res);
+
+        if (!response.ok) {
+
+            res.render('blog', {
+                urlTitle: 'Blog: entradas',
+                msg: '',
+                entries: [],
+                user
+            });
+
+        } else {
+
+            const { data } = response;
 
             if (!data.msg.includes('No hay'))
                 data.data.map(entry => {
@@ -66,15 +79,15 @@ const getEntries = async (req, res) => {
                     entry.time = new Date(entry.date + ' ' + entry.time).toLocaleTimeString();
                 });
 
-            const user = await getUserDataCookie(req, res);
-
             res.render('blog', {
                 urlTitle: 'Blog: entradas',
                 msg: '',
                 entries: data,
                 user
             });
+
         }
+
 
     } catch (e) {
         console.log('catchError en getEntries:', e);
@@ -160,7 +173,7 @@ const searchEntries = async (req, res) => {
 const searchEntriesByEmail = async (req, res) => {
 
     try {
-console.log(req.body,req.params)
+        console.log(req.body, req.params)
         if (req.body.email)
             req.params.email = req.body.email;
 
