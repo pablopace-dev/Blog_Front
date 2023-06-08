@@ -25,6 +25,16 @@ app.use('/', require('./routers/routersFront'));        //Front
 app.use('/user', require('./routers/routerUsers'));     //Users
 app.use('/admin', require('./routers/routerAdmin'));    //Admin
 
+//Awake
+app.use('/wakeup', (req, res) => {
+
+    res.status(200).json({
+        ok: true,
+        msg: `I'm awake (Blog - Front)`
+    });
+
+});
+
 
 //404
 
