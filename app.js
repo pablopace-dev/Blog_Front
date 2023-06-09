@@ -27,6 +27,8 @@ app.use('/admin', require('./routers/routerAdmin'));    //Admin
 
 //Awake
 app.use('/wakeup', (req, res) => {
+    
+    console.log(`I'm awake (Blog - Front)`);
 
     res.status(200).json({
         ok: true,
