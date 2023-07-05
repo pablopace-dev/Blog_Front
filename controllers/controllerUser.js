@@ -7,10 +7,32 @@ const {
     setUserCookie,
     setUserToken,
     getUserDataCookie,
-    clearCookies,
-    getUserTokenCookie } = require('../helpers/cookies');
+    clearCookies } = require('../helpers/cookies');
 
+/**
+ * @author Pablo
+ * @exports Object
+ * @namespace controllerUser
+ */
 
+/**
+ * Definición del tipo User
+ * @typedef {Object} User
+ * @memberof controllerUser
+ * @property {String | Number} id ID del usuario
+ * @property {String} name Nombre del usuario
+ * @property {String} email Email del usuario
+ * @property {String} rol Rol del usuario
+ */
+
+/**
+* Renderiza 'login' para loguearse en la aplicación.
+* @memberof controllerUser 
+* @method showLogin
+* @async
+* @param {Object} req Es el requerimiento que proviene de las rutas
+* @param {Object} res Es la respuesta que proviene de las rutas 
+*/
 const showLogin = async (req, res) => {
 
     await clearCookies(req, res);
@@ -24,6 +46,14 @@ const showLogin = async (req, res) => {
 };
 
 
+/**
+* Renderiza 'register' para registrar un usuario nuevo en la aplicación.
+* @memberof controllerUser 
+* @method showRegister
+* @async
+* @param {Object} req Es el requerimiento que proviene de las rutas
+* @param {Object} res Es la respuesta que proviene de las rutas 
+*/
 const showRegister = async (req, res) => {
 
     await clearCookies(req, res);
@@ -37,6 +67,18 @@ const showRegister = async (req, res) => {
 };
 
 
+/**
+ * Recibe los datos para primero validar, y luego, crear el usuario nuevo,
+ * si las validaciones son correctas se redirige al 'index'.
+ * En caso de errores se devuelven en un Object, y se renderiza el 'register'.
+ * @memberof controllerUser 
+ * @method registerUser
+ * @async
+ * @param {Object} req Es el requerimiento que proviene de las rutas, debe contener
+ * body.password, body.passwordR, body.name y body.email.
+ * @param {Object} res Es la respuesta que proviene de las rutas    
+ * @throws {json} Devuelve el error
+ */
 const registerUser = async (req, res, next) => {
 
     let err = {};
@@ -70,7 +112,7 @@ const registerUser = async (req, res, next) => {
             await setUserCookie(req, res, user);
             await setUserToken(req, res, token);
 
-            res.redirect('/blog');
+            res.redirect('/');
 
         } else {
 
@@ -98,7 +140,8 @@ const registerUser = async (req, res, next) => {
 
 
     } catch (e) {
-       
+        console.log(`catchError en registerUser:`, e);
+
         return res.status(500).json({
             ok: false,
             msg: `Error en registerUser: ${e}`
@@ -108,7 +151,21 @@ const registerUser = async (req, res, next) => {
 };
 
 
-const loginUser = async (req, res, next) => {
+/**
+ * Recibe los datos para validar primero, y luego loguear al usuario.
+ * Si las validaciones son correctas se redirige al 'index' de usuario o administrador
+ * según el rol del usuario, y se crean 2 cookies, una con el token y otros con los datos
+ * del usuario (id, name, email, rol).
+ * En caso de errores se devuelven en un Object, y se renderiza el 'login'.
+ * @memberof controllerUser 
+ * @method loginUser
+ * @async
+ * @param {Object} req Es el requerimiento que proviene de las rutas, debe contener
+ * body.password y body.email.
+ * @param {Object} res Es la respuesta que proviene de las rutas    
+ * @throws {json} Devuelve el error
+ */
+const loginUser = async (req, res) => {
 
     let error;
     try {
@@ -116,9 +173,9 @@ const loginUser = async (req, res, next) => {
         const { url, method } = getURLs('loginUser', req);
 
         const { data } = await fetchData(url, method, req.body);
-        
+
         if (data.ok) {
-            
+
             const user = data.user;
             user.email = req.body.email;
 
@@ -131,26 +188,26 @@ const loginUser = async (req, res, next) => {
                 res.redirect('/admin');
 
             else
-                res.redirect('/blog');
+                res.redirect('/');
 
         } else {
 
             if (data.errors) {
                 if (data.errors.email) error = data.errors.email.msg;
 
-            }
-            else error = data.msg;
+            } else error = data.msg;
 
             res.render('login', {
                 urlTitle: 'Blog: login error',
                 user: req.body.email,
                 error
             });
+
         }
 
-
     } catch (e) {
-       
+        console.log('catchError en loginUser:', e);
+
         return res.status(500).json({
             ok: false,
             msg: `Error en loginUser: ${e}`
@@ -160,6 +217,17 @@ const loginUser = async (req, res, next) => {
 };
 
 
+/**
+ * Registra el logout del usuario, borra las cookies creadas y redirige al 'index'.
+ * En caso de errores se devuelven en un Object.
+ * @memberof controllerUser 
+ * @method logoutUser
+ * @async
+ * @param {Object} req Es el requerimiento que proviene de las rutas, debe contener
+ * body.password y body.email.
+ * @param {Object} res Es la respuesta que proviene de las rutas    
+ * @throws {json} Devuelve el error
+ */
 const logoutUser = async (req, res) => {
 
     try {
@@ -176,6 +244,9 @@ const logoutUser = async (req, res) => {
         res.redirect('/');
 
     } catch (e) {
+
+        console.log(`catchError en logoutUser:`, e);
+
         return res.status(500).JSON({
             ok: false,
             msg: `Error en logoutUser: ${e}`
@@ -185,19 +256,36 @@ const logoutUser = async (req, res) => {
 };
 
 
+/**
+* Redirige al usuario al 'index' que corresponda según su rol: user o admin.
+* @memberof controllerUser 
+* @method redirectUser
+* @async
+* @param {Object} req Es el requerimiento que proviene de las rutas
+* @param {Object} res Es la respuesta que proviene de las rutas 
+*/
 const redirectUser = async (req, res) => {
 
-    const { rol } = await getUserDataCookie(req, res);    
+    const { rol } = await getUserDataCookie(req, res);
 
     if (rol == 'admin')
         res.redirect('/admin');
 
     else
-        res.redirect('/blog');
+        res.redirect('/');
 
 };
 
 
+/**
+ * Renderiza 'changePassword' del administrador para permitir cambiar la contraseña,
+ * se envía un Object :User
+ * @memberof controllerUser
+ * @method showChange
+ * @async
+ * @param {Object} req Es el requerimiento que proviene de las rutas
+ * @param {Object} res Es la respuesta que proviene de las rutas 
+ */
 const showChange = async (req, res) => {
 
     const user = await getUserDataCookie(req, res);
@@ -211,12 +299,25 @@ const showChange = async (req, res) => {
 };
 
 
+/**
+ * Recibe los datos para primero validar, y luego, cambiar la contraseña del usuario,
+ * si las validaciones son correctas se redirige al 'index'.
+ * En caso de errores se devuelven en un Object, y se renderiza el 'changePassword'.
+ * @memberof controllerUser
+ * @method changePassword
+ * @async
+ * @param {Object} req Es el requerimiento que proviene de las rutas, debe contener
+ * body.newPassword, body.oldPassword, body.passwordR y body.email.
+ * @param {Object} res Es la respuesta que proviene de las rutas 
+ * @throws {json} Devuelve el error
+ */
 const changePassword = async (req, res, next) => {
 
     let err = {};
     try {
 
         if (req.body.newPassword != req.body.passwordR) {
+
             err.passwordR = 'Los passwords no coinciden, por favor, revísalos.';
 
             return res.render('changePassword', {
@@ -229,11 +330,11 @@ const changePassword = async (req, res, next) => {
         const { url, method } = getURLs('changePassword', req);
 
         const { data } = await fetchData(url, method, req.body);
-        
-        if (data.ok) {
-            res.redirect('/blog');
 
-        } else {
+        if (data.ok)
+            res.redirect('/');
+
+        else {
 
             if (data.errors) {
 
@@ -257,7 +358,8 @@ const changePassword = async (req, res, next) => {
 
 
     } catch (e) {
-      
+        console.log(`catchError en changePassword:`, e);
+
         return res.status(500).json({
             ok: false,
             msg: `Error en changePassword: ${e}`

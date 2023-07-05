@@ -10,12 +10,17 @@ const {
     deleteEntry,
     getEntryByID,
     changePassword,
-    showChange } = require('../controllers/controllerAdmin');
+    showChange,
+    showLogs } = require('../controllers/controllerAdmin');
 
 const { isAdmin } = require('../middlewares/isAdmin');
 
 
 router.get('/', [
+    isAdmin
+], showAdmin);
+
+router.post('/', [
     isAdmin
 ], showAdmin);
 
@@ -49,6 +54,15 @@ router.get('/change', [
 router.post('/changePass', [
     isAdmin
 ], changePassword);
+
+
+router.post('/logs', [
+    isAdmin
+], showLogs);
+
+router.get('/logs', [
+    isAdmin
+], showLogs);
 
 
 module.exports = router

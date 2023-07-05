@@ -16,19 +16,18 @@ const {
     createEntry } = require('../controllers/controllerFront');
 
 
-router.get('/', (req, res) => {
-    res.render('index', { urlTitle: 'Blog', user: '' });
-});
+// router.get('/', (req, res) => {
+//     res.render('index', { urlTitle: 'Blog', user: '' });
+// });
 
 
-router.get('/blog', [
-    isNotAdmin
-], getEntries);
+router.get('/', getEntries);
 
 
-router.get('/detail/:entryID', [
-    isNotAdmin
-], getEntryByID);
+router.post('/', getEntries);
+
+
+router.get('/detail/:entryID', getEntryByID);
 
 
 router.get('/edit/:entryID', [
@@ -53,20 +52,13 @@ router.post('/new', [
 ], createEntry);
 
 
-router.post('/edit', [
-    isNotAdmin,
-    upload
-], editEntry);
+router.post('/search', searchEntries);
 
 
-router.post('/search/', [
-    isNotAdmin
-], searchEntries);
+router.get('/email', searchEntriesByEmail);
 
 
-router.get('/email/:email', [
-    isNotAdmin
-], searchEntriesByEmail);
+router.post('/email', searchEntriesByEmail);
 
 
 module.exports = router

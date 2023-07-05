@@ -1,7 +1,7 @@
 <%- include( 'templates/header' ,{urlTitle,user} ) %>
 
     <main>
-        <h1 class="h1Admin">Nueva entrada</h1>
+        <h1 class="h1Admin"><%- user.name %>: nueva entrada</h1>
 
         <div class="divEdit">
 
@@ -14,15 +14,15 @@
                 <input type="text" name="dateX" id="date" value="<%- new Date().toLocaleString() %> hrs." readonly>
 
                 <label for="title">Título:</label>
-                <input type="text" name="title" id="title" value="<%- entry.title %>">
+                <input type="text" name="title" id="title" value="<%- entry.title %>" autocomplete="off" autofocus>
                 <span class="spnError"><%- msg.title %></span>
 
                 <label for="extract">Extracto:</label>
-                <input type="text" name="extract" id="extract" value="<%- entry.extract %>">
+                <input type="text" name="extract" id="extract" value="<%- entry.extract %>" autocomplete="off">
                 <span class="spnError"><%- msg.extract %></span>
 
                 <label for="content">Contenido:</label>
-                <textarea name="content" id="content" rows="4"><%- entry.content %></textarea>
+                <textarea name="content" id="content" rows="4" autocomplete="off"><%- entry.content %></textarea>
                 <span class="spnError"><%- msg.content %></span>
 
                 <img src="/media/<%- entry.image %>" alt="">
@@ -36,9 +36,8 @@
 
                 <div class="btns">                    
                     <button id="btnSubmit" type="submit"><i class="fa-solid fa-floppy-disk"></i> Guardar</button>
-                    <!-- <input id="btnSubmit" type="submit" value="Guardar"> -->
-                    <!-- <a id="btnCancelar" href="/blog">Cancelar</a> -->
-                    <a id="btnCancelar" href="/blog"><i class="fa-solid fa-person-running"></i> Cancelar</a>
+                    
+                    <a id="btnCancelar" href="/"><i class="fa-solid fa-person-running"></i> Cancelar</a>
                 </div>
 
             </form>

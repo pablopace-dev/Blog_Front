@@ -1,9 +1,24 @@
 const urlBaseBack = process.env.URL_BASE_BACK;
 const urlAPIEntries = 'api/entries';
 const urlAPIUser = 'api/users';
+const urlAPILogs = 'api/logs';
 
-const limitePorDefecto = 10;
+const limitePorDefecto = 5;
 
+/**
+ * @author Pablo
+ * @exports getURLs
+ * @namespace getURLs
+ */
+
+/**
+ * Devuelve la url y el método para pasar a un fetch.
+ * @memberof getURLs 
+ * @method getURLs
+ * @param {String} tipo El tipo de acción que se quiere realizar (ej: 'getEntries')
+ * @param {Object} data Es el requerimiento 'req' de las rutas
+ * @returns {Object} Devuelve 'url :string' y 'method :string' para pasar a la función de fetchData 
+ */
 
 const getURLs = (tipo, data) => {
 
@@ -11,12 +26,10 @@ const getURLs = (tipo, data) => {
     const params = data.params;
     const query = data.query;
 
-    const page = query.page || 1;
-    const limit = query.limit || limitePorDefecto;
+    const page = body.page || query.page || 1;
+    const limit = body.limit || query.limit || limitePorDefecto;
 
     let url, method;
-
-    //console.log('getURLs: tipo', tipo, 'query', query, 'params', params);
 
     switch (tipo) {
 
@@ -79,10 +92,15 @@ const getURLs = (tipo, data) => {
             break;
 
 
+        //API Logs ***********************
+        case 'getLogs':
+            url = `${urlBaseBack}/${urlAPILogs}?limit=${limit}&page=${page}`;            
+            break;
+
     };
 
     return { url, method };
-}
+};
 
 
 module.exports = { getURLs }
